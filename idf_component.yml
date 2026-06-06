@@ -1,11 +1,11 @@
-## ESP-IDF component manifest for ediabasx-native.
+## ESP-IDF component manifest for ediabasx-embedded.
 ##
 ## Consumed by the bimmerz-box firmware (or any other ESP-IDF project)
 ## via the component manager. The standalone POSIX build remains the
 ## primary build target for desktop development and testing.
 
-description: "Native C port of the ediabasx (BMW EDIABAS) diagnostic engine."
-url: "https://github.com/emdzej/ediabasx-native"
+description: "Embedded C port of the ediabasx (BMW EDIABAS) diagnostic engine."
+url: "https://github.com/emdzej/ediabasx-embedded"
 version: "0.1.0"
 
 dependencies:

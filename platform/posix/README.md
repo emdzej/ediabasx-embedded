@@ -1,6 +1,6 @@
 # platform/posix
 
-POSIX (macOS / Linux) backend for ediabasx-native.
+POSIX (macOS / Linux) backend for ediabasx-embedded.
 
 ## What's here
 

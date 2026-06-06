@@ -1,4 +1,4 @@
-# ediabasx-native
+# ediabasx-embedded
 
 C11 port of the BMW BEST/2 interpreter — embedded-friendly companion to the
 TypeScript reference at `packages/interpreter/`. The wrapper layer in

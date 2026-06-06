@@ -31,7 +31,7 @@ if(ESP_PLATFORM)
     return()
 endif()
 
-project(ediabasx-native C)
+project(ediabasx-embedded C)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
