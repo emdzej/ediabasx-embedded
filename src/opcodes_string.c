@@ -14,6 +14,8 @@
  * comparisons but it's cheaper to match the canonical form upfront.
  */
 
+#include <inttypes.h>
+
 #include "vm_internal.h"
 
 static const char hex_chars[] = "0123456789ABCDEF";
@@ -238,7 +240,7 @@ edxn_error_t edxn_op_string(edxn_vm_t *vm, uint8_t op,
             ? (int32_t)(uraw - (1u << (bw * 8)))
             : (int32_t)uraw;
         char buf[32];
-        snprintf(buf, sizeof(buf), "%d", signed_val);
+        snprintf(buf, sizeof(buf), "%" PRId32, signed_val);
         edxn_write_string(vm, a0, buf);
         return EDXN_OK;
     }
@@ -432,7 +434,7 @@ edxn_error_t edxn_op_string(edxn_vm_t *vm, uint8_t op,
         uint32_t mask = edxn_mask(bw);
         uint32_t uval = (uint32_t)raw & mask;
         char buf[32];
-        snprintf(buf, sizeof(buf), "%u", uval);
+        snprintf(buf, sizeof(buf), "%" PRIu32, uval);
         edxn_write_string(vm, a0, buf);
         return EDXN_OK;
     }

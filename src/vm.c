@@ -29,6 +29,8 @@
  * dwarfed by the actual opcode bodies.
  */
 
+#include <inttypes.h>
+
 #include "vm_internal.h"
 
 void edxn_vm_set_sgbd_loader(edxn_vm_t *vm,
@@ -285,7 +287,7 @@ edxn_error_t edxn_vm_step(edxn_vm_t *vm) {
     vm->pc = inst.next_pc;
 
     if (getenv("EDXN_VTRACE"))
-        fprintf(stderr, "[vm] pc=%04X op=%02X z=%d c=%d s=%d\n",
+        fprintf(stderr, "[vm] pc=%04" PRIX32 " op=%02X z=%d c=%d s=%d\n",
                 saved_pc, inst.opcode, vm->flags.z, vm->flags.c, vm->flags.s);
 
     err = dispatch(vm, inst.opcode, &inst.arg0, &inst.arg1);

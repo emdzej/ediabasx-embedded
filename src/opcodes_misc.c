@@ -14,6 +14,7 @@
  */
 
 #include "vm_internal.h"
+#include <inttypes.h>
 #include <time.h>
 #include <unistd.h>
 #include <ctype.h>
@@ -556,7 +557,7 @@ edxn_error_t edxn_op_misc(edxn_vm_t *vm, uint8_t op,
         if (!e) e = cfg_alloc(vm);
         if (e) {
             strncpy(e->key, key, EDXN_CFG_KEY_MAX - 1); e->key[EDXN_CFG_KEY_MAX - 1] = '\0';
-            snprintf(e->value, EDXN_CFG_VAL_MAX, "%d", val);
+            snprintf(e->value, EDXN_CFG_VAL_MAX, "%" PRId32, val);
             e->used = true;
         }
         return EDXN_OK;
