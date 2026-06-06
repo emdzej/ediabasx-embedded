@@ -1,4 +1,36 @@
 cmake_minimum_required(VERSION 3.20)
+
+# Dual-build CMakeLists: when consumed by ESP-IDF, register as a
+# component and return early. Otherwise fall through to the standard
+# standalone POSIX project build below.
+if(ESP_PLATFORM)
+    set(_edxn_srcs
+        src/prg.c
+        src/registers.c
+        src/flags.c
+        src/stack.c
+        src/vm.c
+        src/ediabas.c
+        src/opcodes_arith.c
+        src/opcodes_flow.c
+        src/opcodes_string.c
+        src/opcodes_result.c
+        src/opcodes_table.c
+        src/opcodes_comm.c
+        src/opcodes_misc.c
+        src/result.c
+        src/table.c
+        src/decode.c
+    )
+    idf_component_register(
+        SRCS ${_edxn_srcs}
+        INCLUDE_DIRS include
+        REQUIRES log
+    )
+    target_compile_features(${COMPONENT_LIB} PUBLIC c_std_11)
+    return()
+endif()
+
 project(ediabasx-native C)
 
 set(CMAKE_C_STANDARD 11)
