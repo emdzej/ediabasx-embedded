@@ -517,46 +517,43 @@ edxn_error_t edxn_ediabas_exec_data(edxn_ediabas_t *eb,
         eb->vm.initialized = true;
         run_ident_and_swap(eb);
     }
-    /* If the user ran IDENT explicitly on a .grp, do the post-job
-       swap (matches TS — runs IDENT on the .grp bytecode, then
-       swaps; auto-chain in run_ident_and_swap was skipped above). */
+    /* If the user ran IDENT explicitly on a .grp, defer the variant
+       swap until AFTER materialisation (mirrors TS executeJob, where
+       `mapped` is captured first then swapToVariant fires). Doing the
+       swap inline here would `edxn_vm_free` the VM and wipe the IDENT
+       results before they reach the response. */
+    bool pending_swap = false;
+    char pending_variant[EDXN_EDIABAS_VARIANT_NAME_MAX];
+    pending_variant[0] = '\0';
     if (is_explicit_ident && eb->prg->header.version == 0 && !eb->ident_ran) {
         eb->ident_ran = true;
-        char variant_name[EDXN_EDIABAS_VARIANT_NAME_MAX];
-        variant_name[0] = '\0';
         for (size_t i = 0; i < eb->vm.current_results.count; i++) {
             const edxn_result_entry_t *e = &eb->vm.current_results.entries[i];
             if (e->type == EDXN_TYPE_STRING && strcasecmp(e->name, "VARIANTE") == 0
                 && e->value.bin.len > 0) {
                 size_t n = e->value.bin.len;
-                if (n >= sizeof(variant_name)) n = sizeof(variant_name) - 1;
-                memcpy(variant_name, e->value.bin.data, n);
-                variant_name[n] = '\0';
+                if (n >= sizeof(pending_variant)) n = sizeof(pending_variant) - 1;
+                memcpy(pending_variant, e->value.bin.data, n);
+                pending_variant[n] = '\0';
             }
         }
-        if (variant_name[0] != '\0') {
+        if (pending_variant[0] != '\0') {
             char group_lower[EDXN_EDIABAS_VARIANT_NAME_MAX];
             char variant_lower[EDXN_EDIABAS_VARIANT_NAME_MAX];
             strip_extension_lower(eb->sgbd_name, group_lower, sizeof(group_lower));
-            for (size_t i = 0; variant_name[i]; i++) {
-                variant_lower[i] = (char)tolower((unsigned char)variant_name[i]);
+            for (size_t i = 0; pending_variant[i]; i++) {
+                variant_lower[i] = (char)tolower((unsigned char)pending_variant[i]);
                 variant_lower[i + 1] = '\0';
             }
             group_cache_set(eb, group_lower, variant_lower);
-            /* swap_to_variant resets system_results — capture the
-               user's job sets first so the materialise below sees
-               them. We snapshot then restore. */
-            /* For .grp IDENT: there are no data sets the user expects
-               beyond IDENT's own results, and swap reloads INFO. The
-               TS behaviour leaves the user's IDENT results visible
-               via the materialise step that follows. To match, we
-               materialise BEFORE the swap when the user explicitly
-               ran IDENT. */
+            pending_swap = true;
         }
     }
 
     /* Materialise [system_set, ...data_sets]:
-       data_sets = archived result_sets[] + current_results-if-nonempty. */
+       data_sets = archived result_sets[] + current_results-if-nonempty.
+       Deep-copies via built_sets_push so the values survive a later
+       swap_to_variant (which calls edxn_vm_free). */
     built_sets_clear(eb);
 
     size_t data_set_count = eb->vm.result_set_count
@@ -576,6 +573,23 @@ edxn_error_t edxn_ediabas_exec_data(edxn_ediabas_t *eb,
     if (eb->vm.current_results.count > 0) {
         err = built_sets_push(eb, &eb->vm.current_results);
         if (err != EDXN_OK) return err;
+    }
+
+    /* Variant swap fires AFTER the data sets are safely in built_sets.
+       The swap clears `system_results` and re-runs INFO from the
+       variant — we then rebuild built_sets[0] (the system set) so the
+       caller sees the variant's metadata (VARIANTE / ECU / ORIGIN /
+       REVISION coming from the resolved variant, not the .grp). */
+    if (pending_swap) {
+        swap_to_variant(eb, pending_variant);
+        edxn_result_set_t new_system_set;
+        err = build_system_set(eb, job_name, data_set_count, &new_system_set);
+        if (err == EDXN_OK) {
+            edxn_result_free(&eb->built_sets[0]);
+            err = result_set_copy(&eb->built_sets[0], &new_system_set);
+            edxn_result_free(&new_system_set);
+            if (err != EDXN_OK) return err;
+        }
     }
     return EDXN_OK;
 }
