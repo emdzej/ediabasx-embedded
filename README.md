@@ -272,3 +272,29 @@ ongoing gaps:
 The TS interpreter and TypeScript Ediabas class remain the source of truth
 for every opcode's semantics. If you find a behavioural mismatch, the TS
 side wins — file a fix against the C port.
+
+## Right to Repair
+
+The [Right to Repair](https://repair.eu) movement advocates for consumers' ability to fix the products they own — from electronics to vehicles — without being locked out by manufacturers through proprietary tools, paywalled documentation, or artificial restrictions.
+
+**I build these tools because I believe repair is a fundamental right, not a privilege.**
+
+Too often, service manuals, diagnostic software, and technical documentation are kept behind closed doors — unavailable to individuals even when they're willing to pay. This wasn't always the case. Products once shipped with schematics and repair guides as standard. The increasing complexity of modern technology doesn't change the fact that capable people exist who can — and should be allowed to — use that information.
+
+These projects exist to preserve access to technical knowledge and ensure that owners aren't left at the mercy of vendors who may discontinue support, charge prohibitive fees, or simply refuse service.
+
+## Support
+
+If you find this project useful, consider [buying me a coffee](https://buymeacoffee.com/emdzej) ☕ or [sponsoring on GitHub](https://github.com/sponsors/emdzej) or if it's your thing: via PayPal
+
+[![Donate with PayPal](https://www.paypalobjects.com/en_US/PL/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate/?business=TDBR3A97PLQRQ&no_recurring=0&item_name=%28emdzej%29&currency_code=PLN)
+
+## License
+
+[PolyForm Noncommercial 1.0.0](./LICENSE) — free for noncommercial use (personal projects, research, education, hobby diagnostics on your own car). Commercial use requires a separate licence — open an issue if you need one.
+
+This repository contains no BMW proprietary data. All DATEN files, SGBDs, and IPOs that consumers of this library load at runtime must come from a legally-acquired BMW Standard Tools install on the user's own machine.
+
+## Disclaimer
+
+This project is for educational and research purposes only. It is not affiliated with BMW AG.

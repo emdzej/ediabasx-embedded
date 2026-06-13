@@ -9,6 +9,13 @@ Tags are bare semver (no `v` prefix), e.g. `0.1.0`.
 
 ## [Unreleased]
 
+### Added
+- `LICENSE` (PolyForm Noncommercial 1.0.0) — the project was always
+  intended as noncommercial; this commits the explicit terms in-tree.
+- README trailer: *Right to Repair*, *Support*, *License*, *Disclaimer*
+  sections to align with the rest of the bimmerz tooling family.
+- `.github/FUNDING.yml` — GitHub Sponsors + Buy Me a Coffee links.
+
 ## [0.1.0] — 2026-06-13
 
 Initial release. C11 port of the BMW BEST/2 interpreter with feature-parity
