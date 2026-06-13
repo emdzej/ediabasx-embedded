@@ -1,9 +1,12 @@
 # ediabasx-embedded
 
 C11 port of the BMW BEST/2 interpreter — embedded-friendly companion to the
-TypeScript reference at `packages/interpreter/`. The wrapper layer in
-`ediabas.h` / `ediabas.c` mirrors the TS `Ediabas` class (one layer above
-the pure interpreter).
+TypeScript reference at [`emdzej/ediabasx`](https://github.com/emdzej/ediabasx)
+(`packages/interpreter/`). The wrapper layer in `ediabas.h` / `ediabas.c`
+mirrors the TS `Ediabas` class (one layer above the pure interpreter).
+
+See [CHANGELOG.md](CHANGELOG.md) for the release log. Tags are bare semver
+(no `v` prefix).
 
 ## What's here
 
@@ -16,7 +19,7 @@ the pure interpreter).
 | `platform/esp32/` | Reserved for the ESP32 dongle port. Empty for now. |
 | `test/` | Unit tests + `edxn_run` CLI driver (uses the wrapper). |
 
-## Build
+## Build (standalone POSIX)
 
 ```bash
 ./build.sh         # cmake -B build && cmake --build build
@@ -28,6 +31,34 @@ Tests:
 ```bash
 cd build && ctest --output-on-failure
 ```
+
+## Use as an ESP-IDF component
+
+`CMakeLists.txt` is dual-mode — under `ESP_PLATFORM` it registers as a
+component and skips the standalone project build. Pull it via the IDF
+Component Manager by adding a dependency to your project's
+`main/idf_component.yml`:
+
+```yaml
+dependencies:
+  ediabasx-embedded:
+    git: https://github.com/emdzej/ediabasx-embedded
+    version: ">=0.1.0"
+```
+
+Or, for in-tree development against a local checkout (the path used by
+`bimmerz-box/firmware`):
+
+```yaml
+dependencies:
+  ediabasx-embedded:
+    path: ../../../../ediabasx-embedded
+```
+
+The component links the BEST/2 interpreter + Ediabas wrapper sources. The
+POSIX backend in `platform/posix/` is **not** compiled in IDF builds —
+ESP32 targets supply their own transport via `edxn_transport_t` and their
+own SGBD loader via the wrapper's callback hooks.
 
 ## Run a job against a real ECU
 
